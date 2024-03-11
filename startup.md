@@ -1,5 +1,6 @@
 
 ## Setup on UCloud
+(Make sure you have a DJANGO_SECRET_KEY set in ur environment. See the `.example.env` file)
 Assuming you have set up a django app with a GFPU and have accessed the docker container: 
 
 Create a conda environment and install requirements.txt
