@@ -1,32 +1,4 @@
-
-## Setup on UCloud
-(Make sure you have a DJANGO_SECRET_KEY set in ur environment. See the `.example.env` file)
-Assuming you have set up a django app with a GFPU and have accessed the docker container: 
-
-Create a conda environment and install requirements.txt
-```bash
-conda create -n myenv
-conda activate myenv
-conda install --file requirements.txt
-```
-
-Install CUDA toolkit 12.2.2. 
-```bash
-mamba install -y -c 'nvidia/label/cuda-12.2.2' cuda
-```
-
-Install llama-cpp-python with cuBLAS support, so that we can use the GPU
-```bash
-CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install --force-reinstall --upgrade --no-cache-dir llama-cpp-python
-```
-
-Fire up the django app
-```bash
-python manage.py runserver
-```
-
-### Change the model
-Change the model in `config.py`. Note that it has to be supported by llama-cpp-python.
+This repo contains the code for a Django app that serves as a wrapper for the `llama-cpp-python` library. The app is designed to be deployed on a UCloud server, and it is set up to use a GPU for inference. The point to enable students in the AIML course to interact with a powerful LLM through a simple API call.
 
 ## Calling the app
 
@@ -75,6 +47,7 @@ requester = UCloudRequester(
 Then you can call the app like this:
 
 ```python
+# example model params
 params = dict(
     max_tokens=50,
     temperature=0.5,
@@ -112,3 +85,40 @@ Yields
  'timestamp': '2024-03-11T21:58:51.087056',
  'email': 'ur-email@cbs.dk'}
 ```
+
+***
+
+## Setup on UCloud
+(Make sure you have a DJANGO_SECRET_KEY set in ur environment. See the `.example.env` file)
+Assuming you have set up a django app with a GFPU and have accessed the docker container: 
+
+Initialize mamba and refresh the session
+```bash
+mamba init
+bash -l
+```
+
+Then, create a conda environment and install requirements.txt
+```bash
+mambda create -p ./myenv
+mambda activate myenv
+mambda install --file requirements.txt
+```
+
+Install CUDA toolkit 12.2.2. 
+```bash
+mamba install -y -c 'nvidia/label/cuda-12.2.2' cuda
+```
+
+Install `llama-cpp-python` with cuBLAS support, so that we can use the Nvidia GPU
+```bash
+CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install --force-reinstall --upgrade --no-cache-dir llama-cpp-python
+```
+
+Fire up the django app. This will download the model from HuggingfaceHub. The default model is "mixtral-8x7b-instruct-v0.1.Q6_K.gguf" from the HF repo "TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF"
+```bash
+python manage.py runserver
+```
+
+### Change the model
+Change the model in `config.py`. Note that it has to be supported by llama-cpp-python.
