@@ -12,13 +12,12 @@ conda install --file requirements.txt
 
 Install CUDA toolkit 12.2.2. 
 ```bash
-mamba install -y -c "nvidia/label/cuda-12.2.2” cuda
+mamba install -y -c 'nvidia/label/cuda-12.2.2' cuda
 ```
 
 Install llama-cpp-python with cuBLAS support, so that we can use the GPU
 ```bash
-CMAKE_ARGS="-DLLAMA_CUBLAS=on" \
-  pip install --force-reinstall --upgrade --no-cache-dir llama-cpp-python
+CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install --force-reinstall --upgrade --no-cache-dir llama-cpp-python
 ```
 
 Fire up the django app
