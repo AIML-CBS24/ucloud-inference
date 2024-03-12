@@ -28,10 +28,8 @@ django-oauth-toolkit
 djangorestframework
 dnspython
 docopt
-email_validator
 exceptiongroup
 executing
-fastjsonschema
 filelock
 frozenlist
 fsspec
@@ -48,7 +46,6 @@ jupyter_client
 jupyter_core
 jupyterlab_pygments
 jwcrypto
-llama_cpp_python
 loguru
 MarkupSafe
 matplotlib-inline
@@ -58,7 +55,6 @@ multiprocess
 nbclient
 nbconvert
 nbformat
-nest_asyncio
 numpy
 oauthlib
 packaging
@@ -72,12 +68,10 @@ platformdirs
 prompt-toolkit
 psutil
 ptyprocess
-pure-eval
 pyarrow
 pyarrow-hotfix
 pycparser
 pydantic
-pydantic_core
 Pygments
 PyJWT
 PySocks
@@ -96,7 +90,6 @@ six
 sniffio
 soupsieve
 sqlparse
-stack-data
 tinycss2
 tokenizers
 tornado
