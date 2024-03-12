@@ -19,6 +19,7 @@ class App(AppConfig):
             n_gpu_layers=-1,  # Use GPU acceleration if available
             local_dir="models",
             cache_dir=".hf_cache",
+            n_ctx=4_000,
             verbose=VERBOSE,
             
         )

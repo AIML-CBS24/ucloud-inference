@@ -166,3 +166,4 @@ db.*
 models/*
 !models/.gitkeep
 .DS_Store
+aiml24/

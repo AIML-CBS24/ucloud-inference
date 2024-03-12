@@ -26,7 +26,7 @@ SECRET_KEY = DJANGO_SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["app-aiml24.cloud.sdu.dk"]
 CORS_ALLOW_ALL_ORIGINS = True
 APPEND_SLASH = False
 
