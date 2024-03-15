@@ -1,4 +1,4 @@
-This repo contains the code for a Django app that serves as a wrapper for the `llama-cpp-python` library. The app is designed to be deployed on a UCloud server, and it is set up to use a GPU for inference. The point to enable students in the AIML course to interact with a powerful LLM through a simple API call.
+This repo contains the code for running a llama-cpp-python server with a nginx reverse proxy on UCloud. The app is designed to be deployed on a UCloud server, and it is set up to use a GPU for inference. The point to enable students in the AIML course to interact with a powerful LLM through a simple API call.
 
 ## Calling the app
 
@@ -6,42 +6,45 @@ Here is an uncessarily complicated class to make calls against a public URL such
 
 ```python
 class UCloudRequester:
+    """ This class is a simple container for the UCloud API 
+    request. It is used to send a query to the UCloud API 
+    and return the response with or without metadata."""
 
-    def __init__(self, url : str, email : str) -> None:
-        self.url = url
-        self.email = email
+    def __init__(self, url : str) -> None:
+        self.url = url # URL of the UCloud API
 
-    def _predict(self, prompt : str, **params) -> dict:
+    def call_url(self, prompt : str, **params) -> dict:
+        """This method handles the call to the UCloud API and
+        returns the response as a dictionary"""
 
-        try:
-            query = {
-                'email': self.email,
-                'prompt': prompt,
-                'params': {**params}
-            }
-            headers = {
-                'Content-Type': 'application/json'
-            }
-            response = requests.post(self.url, headers=headers, json=query)
-            return response.json()
+        # try:
+        query = {'prompt': prompt, **params}
+        response = requests.post(
+            url=self.url,
+            headers={'Content-Type': 'application/json'},
+            json=query
+        )
+        return response.json() # <- Translates JSON to dictionary
         
-        except requests.exceptions.JSONDecodeError:
-            return f"Failed to decode response as JSON: {response.text}"
+        # except requests.exceptions.JSONDecodeError:
+        #     return f"JSONDecodeError: Failed to decode response as JSON: {response.text}"
 
-        except requests.exceptions.HTTPError as e:
-            return "Error: " + str(e)
+        # except requests.exceptions.HTTPError as e:
+        #     return "HTTPError: " + str(e)
         
-    
-    def predict(self, prompt : str, return_meta=False, **params) -> dict | str:
-        result : dict = self._predict(prompt, **params)
+    def predict(self, prompt : str, return_meta=False, **params) -> dict:
+        """This method is the main method for sending a request.
+        if return_meta is set to True, the method will return the
+        full response as a dictionary. Otherwise, it will return
+        the text of the first choice in the response."""
+
+        result : dict = self.call_url(prompt, **params)
         if return_meta:
             return result
         return result["choices"][0]["text"]
     
-requester = UCloudRequester(
-    url="<UCLOUD URL>",
-    email="ur-emailc@cbs.dk"
-)
+
+requester = UCloudRequester(url=URL)
 ```
 
 Then you can call the app like this:
@@ -86,38 +89,24 @@ Yields
  'email': 'ur-email@cbs.dk'}
 ```
 
+### Swagger
+The app is also set up with a swagger UI at `/docs`. 
+
 ***
 
 ## Setup on UCloud
-(Make sure you have a DJANGO_SECRET_KEY set in ur environment. See the `.example.env` file)
-Assuming you have set up a django app with a GFPU and have accessed the docker container: 
+Assuming you have set up an nginx app with a GPU and have accessed the terminal. The `setup.sh` should run on initialization, meaning that conda is installed and ready to go.
 
-Initialize mamba and refresh the session
+
+
+create the conda environment with CMAKE_ARGS and FORCE_CMAKE to enable cuBLAS support
 ```bash
-mamba init
-bash -l
+CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 conda env create -f environment.yml
 ```
 
-Then, create a conda environment and install requirements.txt
+Fire up the llama.cpp server by running `run.sh` . This will download the model from HuggingfaceHub. The default model is "mixtral-8x7b-instruct-v0.1.Q5_K_M.gguf" from the HF repo "TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF"
 ```bash
-mambda create -p ./myenv
-mambda activate myenv
-mambda install --file requirements.txt
-```
 
-Install CUDA toolkit 12.2.2. 
-```bash
-mamba install -y -c 'nvidia/label/cuda-12.2.2' cuda
-```
-
-Install `llama-cpp-python` with cuBLAS support, so that we can use the Nvidia GPU
-```bash
-CMAKE_ARGS="-DLLAMA_CUBLAS=on" FORCE_CMAKE=1 pip install --force-reinstall --upgrade --no-cache-dir llama-cpp-python
-```
-
-Fire up the django app. This will download the model from HuggingfaceHub. The default model is "mixtral-8x7b-instruct-v0.1.Q6_K.gguf" from the HF repo "TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF"
-```bash
-python manage.py runserver
 ```
 
 ### Change the model
